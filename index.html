@@ -3,730 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Adivinhar Palavras</title>
+    <title>Palavras Cruzadas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Just+Me+Again+Down+Here&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Variaveis de Cor e Estilo */
         :root {
-            --cor-fundo: #fdfdfd;
-            --cor-texto: #333;
-            --cor-borda: #d3d6da00;
-            --cor-correta: #6aaa64;
-            --cor-presente: #c9b458;
-            --cor-ausente: #787c7e;
-            --cor-tecla-padrao: #e0e0e0;
-            --cor-fundo-modal: rgba(0, 0, 0, 0.6);
-            
-            /* CUSTOMIZAÇÃO: Coloque o link da sua imagem aqui para customizar o fundo dos blocos https://i.ibb.co/35H3738p/imagem-2025-07-03-162110752.png*/
-            --tile-bg-image: url('https://i.ibb.co/VW70D0f7/67b6cedb-a96c-4ed6-af25-e99e2faa607e-removalai-preview.png'); 
+            --main-color: #0077b6;
+            --dark-color: #14213d;
+            --light-color: #ffffff;
+            --correct-color: #4caf50;
+            --hint-color: #a5d6a7;
+            --font-title: 'Lilita One', cursive;
+            --font-body: 'Roboto', sans-serif;
+            --cell-size: 40px;
+            --gap-size: 2px;
         }
 
-        /* Estilos Gerais */
         body {
-            font-family: 'Just Me Again Down Here', cursive;
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto);
+            font-family: var(--font-body);
+            background-color: var(--light-color);
+            color: var(--dark-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             min-height: 100vh;
             margin: 0;
-            font-size: 24px;
-            letter-spacing: 1px;
-        }
-
-        /* Cabeçalho */
-        header {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 2px solid var(--cor-borda);
-            position: relative;
-        }
-
-        header h1 {
-            font-size: 3.5rem;
-            margin: 0;
-            color: var(--cor-texto);
-            text-shadow: 2px 2px #eee;
-        }
-
-        #hint-button {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        #hint-button svg {
-            width: 36px;
-            height: 36px;
-            fill: var(--cor-presente);
-            transition: transform 0.2s ease;
-        }
-        #hint-button:hover svg {
-            transform: scale(1.1);
-        }
-
-        /* Layout Principal */
-        #main-wrapper {
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 30px;
-            width: 100%;
-            padding: 10px;
-            flex-grow: 1;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         #game-wrapper {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Área de Dicas e Alertas */
-        #hint-area {
-            height: 40px;
-            margin: 15px 0;
-            font-size: 1.8rem;
-            color: #555;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* Tabuleiro do Jogo */
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-        }
-
-        #game-board {
-            display: grid;
-            grid-gap: 6px;
-            padding: 10px;
-        }
-
-        .tile {
-            width: 65px;
-            height: 65px;
-            border: 2px solid var(--cor-borda);
-            font-size: 3rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-transform: uppercase;
-            color: var(--cor-texto);
-            background-size: cover;
-            background-position: center;
-            background-image: var(--tile-bg-image);
-            transition: transform 0.6s, background-color 0.6s, border-color 0.6s;
-            transform-style: preserve-3d;
-        }
-        
-        .tile.filled {
-            border-color: #878a8c;
-        }
-
-        .tile.flip {
-            transform: rotateX(360deg);
-        }
-
-        .tile.correct {
-            background-color: var(--cor-correta);
-            border-color: var(--cor-correta);
-            color: white;
-        }
-
-        .tile.present {
-            background-color: var(--cor-presente);
-            border-color: var(--cor-presente);
-            color: white;
-        }
-
-        .tile.absent {
-            background-color: var(--cor-ausente);
-            border-color: var(--cor-ausente);
-            color: white;
-        }
-        
-        /* Painel de Dicas Reveladas */
-        #hints-panel {
-            width: 220px;
-            padding: 15px;
-            margin-top: 55px; /* Alinha com o topo do tabuleiro */
-            border: 2px solid var(--cor-borda);
-            border-radius: 10px;
-            background-color: #fafafa;
-        }
-
-        #hints-panel h3 {
-            text-align: center;
-            margin-top: 0;
-            font-size: 2.2rem;
-            border-bottom: 2px solid var(--cor-borda);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        #revealed-hints-list {
-            font-size: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .revealed-hint {
-            padding: 8px;
-            background-color: #fff;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* Teclado Virtual */
-        #keyboard {
-            display: grid;
-            grid-template-columns: repeat(10, minmax(auto, 45px));
-            grid-auto-rows: 60px;
-            gap: 8px;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
             margin-top: 20px;
         }
 
-        .key {
-            font-family: sans-serif; /* Fonte mais legível para o teclado */
-            font-weight: bold;
-            font-size: 1.2rem;
-            border: none;
-            padding: 0;
-            border-radius: 6px;
-            cursor: pointer;
-            background-color: var(--cor-tecla-padrao);
-            color: var(--cor-texto);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-transform: uppercase;
-            transition: background-color 0.2s;
-        }
-        .key:hover {
-            background-color: #ccc;
-        }
-        .key.large {
-            grid-column: span 2;
-            font-size: 1rem;
-        }
-        .key.alt {
-            grid-row: span 2;
-            font-size: 1.5rem;
-        }
-
-        /* Modos de Jogo e Controles */
-        #modes-section {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .mode-button {
-            font-family: 'Just Me Again Down Here', cursive;
-            font-size: 2rem;
-            padding: 10px 25px;
-            border-radius: 10px;
-            border: 2px solid var(--cor-texto);
-            background-color: white;
-            color: var(--cor-texto);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px #999;
-        }
-        .mode-button:hover {
-            background-color: #f0f0f0;
-        }
-        .mode-button:active {
-            box-shadow: 0 2px #666;
-            transform: translateY(2px);
-        }
-        .mode-button.restart {
-            background-color: var(--cor-presente);
-            color: white;
-            border-color: #a79444;
-        }
-        .mode-button.active {
-            background-color: var(--cor-texto);
-            color: white;
+        #crossword-container {
+            position: relative; 
+            flex-shrink: 0;
         }
         
-        /* Modal de Alerta */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
+        #image-overlay {
+            position: absolute;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: var(--cor-fundo-modal);
+            pointer-events: none; 
+            z-index: 2;
+        }
+
+        #image-overlay img {
+            position: absolute;
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #crossword-grid {
+            display: grid;
+            gap: var(--gap-size);
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            background-color: var(--light-color);
+            position: relative;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 30px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        /* Responsividade */
-        @media (max-width: 900px) {
-            #main-wrapper {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
-            #hints-panel {
-                width: 90%;
-                max-width: 500px; 
-                margin-top: 10px;
-                order: 3; /* Manda o painel para baixo do teclado */
-            }
-            #game-wrapper {
-                order: 1;
-            }
-            #modes-section {
-                order: 2;
-            }
+        .cell.blocked {
+            background-color: transparent;
+            border: none;
         }
 
-        @media (max-width: 600px) {
-            header h1 {
-                font-size: 2.5rem;
+        .cell input {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 1.5rem;
+            font-family: var(--font-title);
+            text-transform: uppercase;
+            padding: 0;
+            margin: 0;
+            outline: none;
+            background-color: var(--light-color);
+            transition: all 0.2s ease;
+            border-radius: 2px;
+        }
+
+        .cell input:focus {
+            border-color: var(--main-color);
+            background-color: #e3f2fd;
+        }
+        
+        .cell input.correct {
+            background-color: var(--correct-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .cell input.hint {
+            background-color: var(--hint-color);
+            color: var(--dark-color);
+        }
+
+        .clue-number {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: var(--main-color);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #clues-container {
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        #clues-container h2 {
+            font-family: var(--font-title);
+            color: var(--main-color);
+            margin-top: 0;
+            border-bottom: 2px solid var(--main-color);
+            padding-bottom: 10px;
+        }
+
+        #clues-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #clues-list li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        #actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            border: 2px solid var(--dark-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        button:hover {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            transform: translateY(-2px);
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: var(--correct-color);
+        }
+        
+        @media (max-width: 900px) {
+            #game-wrapper {
+                flex-direction: column;
+                align-items: center;
             }
-            .tile {
-                width: 50px;
-                height: 50px;
-                font-size: 2.5rem;
-            }
-            #keyboard {
-                grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
-                gap: 4px;
-                padding: 0 5px;
-            }
-            .key {
-                height: 50px;
-            }
-            #modes-section {
-                gap: 10px;
-            }
-            .mode-button {
-                font-size: 1.5rem;
-                padding: 8px 15px;
-            }
+            :root { --cell-size: 35px; }
+            .cell input { font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            :root { --cell-size: 28px; }
+            .cell input { font-size: 1rem; }
+            .clue-number { font-size: 0.5rem; }
+            button { font-size: 1rem; padding: 10px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Adivinhe a Palavra!</h1>
-    </header>
-
-    <div id="main-wrapper">
-        <button id="hint-button" title="Pedir uma dica">
-            <img src="https://cdn-icons-png.flaticon.com/512/2988/2988036.png" alt="Hint Icon" style="width: 64px; height: 64px;">
-        </button>
-
-        <div id="game-wrapper">
-            <div id="game-container">
-                
-                <div id="hint-area"></div>
-                <div id="game-board"></div>
-            </div>
-            
-            <div id="keyboard"></div>
-
-            
+    <div id="game-wrapper">
+        <div id="crossword-container">
+            <div id="image-overlay"></div>
+            <div id="crossword-grid"></div>
         </div>
-        <div id="hints-panel">
-            <h3>Letras Reveladas</h3>
-            <div id="revealed-hints-list"></div>
-        </div>
+        <!-- <div id="clues-container">
+            <h2>Dicas</h2>
+            <ul id="clues-list"></ul>
+        </div> -->
     </div>
 
-
-    <div id="modes-section">
-        <button class="mode-button" data-length="6">6 Letras</button>
-        <button class="mode-button" data-length="8">8 Letras</button>
-        <button class="mode-button" data-length="10">10 Letras</button>
-        <button class="mode-button restart" id="restart-button">Reiniciar</button>
+    <div id="actions">
+        <button id="new-game-btn">Novo Jogo</button>
+        <button id="hint-btn">Dica</button>
     </div>
 
-    <div id="alert-modal" class="modal">
-        <div class="modal-content">
-            <p id="alert-message"></p>
-        </div>
-    </div>
+    <div id="message"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- BANCO DE PALAVRAS ---
-            const listaDePalavras6Letras = [{"numero": 1,"palavra": "Mônica","dica": "Protagonista principal, conhecida por sua força e seu coelho Sansão."}, {"numero": 2,"palavra": "Cascão","dica": "Famoso por seu medo de água e por andar sempre sujinho."}, {"numero": 3,"palavra": "Cebola","dica": "Troca o 'R' pelo 'L' e cria planos 'infalíveis'."}, {"numero": 4,"palavra": "Magali","dica": "Tem um apetite insaciável, especialmente por melancia."}, {"numero": 5,"palavra": "Xaveco","dica": "Personagem cuja principal característica é ser o 'eterno secundário'."}, {"numero": 6,"palavra": "Penado","dica": "Fantasma que vive em um cemitério com outros monstros."}, {"numero": 7,"palavra": "Piteco","dica": "Homem das cavernas que vive na fictícia aldeia de Lem."}, {"numero": 8,"palavra": "Coelho","dica": "Em referência ao Sansão, o bichinho de pelúcia azul."}, {"numero": 9,"palavra": "Sansão","dica": "O nome oficial do coelho de pelúcia azul da Mônica."}, {"numero": 10,"palavra": "Mingau","dica": "O gato de estimação angorá da Magali."}, {"numero": 11,"palavra": "Marina","dica": "Adora desenhar e tem um lápis mágico."}, {"numero": 12,"palavra": "Denise","dica": "Conhecida por ser a mais descolada e fofoqueira."}, {"numero": 13,"palavra": "Nimbus","dica": "Amigo do Cascão que tem interesse por mágica e tempo."}, {"numero": 14,"palavra": "Aninha","dica": "A namorada ciumenta do Titi."}, {"numero": 15,"palavra": "Bairro","dica": "O famoso 'Bairro do Limoeiro'."}, {"numero": 16,"palavra": "Balões","dica": "Elemento gráfico para representar as falas dos personagens."}, {"numero": 17,"palavra": "Letras","dica": "Refere-se ao estilo do texto escrito nos gibis."}, {"numero": 18,"palavra": "Bolota","dica": "Uma onça-pintada amiga do Pererê, de Ziraldo."}, {"numero": 19,"palavra": "Sacaci","dica": "Um dos muitos primos do Saci que vivem na Mata do Fundão."}, {"numero": 20,"palavra": "Tônico","dica": "Primo do Chico Bento que mora na cidade."}];
-            const listaDePalavras8Letras = [{"numero": 1,"palavra": "Jeremias","dica": "Amigo antigo do Cebolinha, conhecido por seu boné."}, {"numero": 2,"palavra": "Jotalhão","dica": "O elefante verde e desastrado da Turma da Mata."}, {"numero": 3,"palavra": "História","dica": "A narrativa contada em cada gibi."}, {"numero": 4,"palavra": "Quadrado","dica": "Cada um dos quadros que compõem uma página de gibi."}, {"numero": 5,"palavra": "Turminha","dica": "Forma carinhosa de se referir ao grupo de personagens."}, {"numero": 6,"palavra": "Mauricio","dica": "O criador da Turma da Mônica."}, {"numero": 7,"palavra": "Leitores","dica": "O público que acompanha as histórias em quadrinhos."}, {"numero": 8,"palavra": "Humberto","dica": "Personagem que se comunica apenas por mímica."}, {"numero": 9,"palavra": "Carminha","dica": "A personagem Carminha Frufru, vizinha rica da Mônica."}, {"numero": 10,"palavra": "Bolinha","dica": "Personagem da Turma da Luluzinha, líder do 'Clube dos Meninos'."}, {"numero": 11,"palavra": "Gibiteca","dica": "Uma biblioteca ou coleção especializada em gibis."}, {"numero": 12,"palavra": "Tirinhas","dica": "As histórias curtas publicadas em jornais."}, {"numero": 13,"palavra": "Limoeiro","dica": "O nome do bairro fictício onde vive a Turma da Mônica."}, {"numero": 14,"palavra": "Desenhar","dica": "A ação de criar os traços dos personagens e cenários."}, {"numero": 15,"palavra": "Clássico","dica": "Termo para uma história ou personagem antigo de grande sucesso."}, {"numero": 16,"palavra": "Aventura","dica": "Um dos gêneros mais comuns das histórias."}, {"numero": 17,"palavra": "Infância","dica": "Fase da vida associada à leitura de gibis."}, {"numero": 18,"palavra": "Diálogos","dica": "As conversas entre os personagens nos balões de fala."}, {"numero": 19,"palavra": "Artistas","dica": "Os profissionais que criam as histórias em quadrinhos."}, {"numero": 20,"palavra": "Malandro","dica": "Arquétipo personificado pelo papagaio Zé Carioca."}];
-            const listaDePalavras10Letras = [{"numero": 1,"palavra": "Passatempo", "dica": "As atividades e jogos encontrados nos almanaques."}, {"numero": 2,"palavra": "Personagem", "dica": "Refere-se a qualquer figura de uma história, como a Mônica ou o Piteco."}, {"numero": 3, "palavra": "Colecionar", "dica": "O ato de juntar e guardar os gibis, um hobby muito popular."}, { "numero": 4, "palavra": "Republicar", "dica": "A ação de imprimir e publicar novamente uma história antiga."}, { "numero": 5, "palavra": "Letreirista", "dica": "O profissional que desenha as letras dos diálogos e das legendas." }, { "numero": 6, "palavra": "Jumentinho", "dica": "O Genesinho, o jumento de estimação e fiel companheiro do Chico Bento." }, { "numero": 7, "palavra": "Publicação", "dica": "O ato de produzir e lançar uma edição de um gibi." }, {"numero": 8, "palavra": "Dinossauro", "dica": "Em referência ao Horácio, o Tiranossauro Rex vegetariano e filósofo." }, {"numero": 9, "palavra": "Astronauta", "dica": "O personagem que viaja pelo espaço em sua nave redonda, o Astróide."},
-{
-"numero": 10,
-"palavra": "Revistinha",
-"dica": "Um termo popular e muito carinhoso para se referir aos gibis."
-},
-{
-"numero": 11,
-"palavra": "Quadrinhos",
-"dica": "A forma plural de \"quadrinho\", a mídia como um todo."
-},
-{
-"numero": 12,
-"palavra": "Atividades",
-"dica": "Os jogos e brincadeiras que complementam as histórias nos almanaques."
-},
-{"numero": 13, "palavra": "Ilustrador", "dica": "O artista que cria os desenhos para as histórias."},
-{"numero": 14, "palavra": "Roteirista", "dica": "O escritor que cria o enredo e os diálogos das histórias."},
-{"numero": 15, "palavra": "Escritores", "dica": "O conjunto de profissionais que escrevem as aventuras da turma."},
-{"numero": 16, "palavra": "Brincalhão", "dica": "Adjetivo que descreve o temperamento de muitos personagens, como o Cebolinha."},
-{"numero": 17, "palavra": "Brasileiro", "dica": "A nacionalidade da grande maioria dos nossos queridos gibis."},
-{"numero": 18, "palavra": "Planetário", "dica": "Local que estuda os astros, relacionado ao universo do Astronauta."},
-{"numero": 19, "palavra": "Gargalhada", "dica": "O resultado que muitas das histórias de comédia buscam provocar no leitor."},
-{"numero": 20, "palavra": "Balãozinho", "dica": "O diminutivo de balão, referindo-se aos balões de fala e pensamento."}];
+            const bancoDePalavras = [
+                { palavra: "MONICA", dica: "Dona da rua, sempre com seu coelhinho Sansão.", imagem: "https://upload.wikimedia.org/wikipedia/pt/4/43/Monica_%28Mauricio_de_Sousa_Produ%C3%A7%C3%B5es%29.png" },
+                { palavra: "CEBOLINHA", dica: "Troca o 'R' pelo 'L' em suas falas e tem um plano 'infalível'.", imagem: "https://upload.wikimedia.org/wikipedia/pt/9/98/Cebolinha.png" },
+                { palavra: "CASCAO", dica: "Tem pavor de água e vive fugindo do banho.", imagem: "https://upload.wikimedia.org/wikipedia/pt/3/35/Cascao.png" },
+                { palavra: "MAGALI", dica: "Conhecida por seu apetite voraz, come de tudo!", imagem: "https://upload.wikimedia.org/wikipedia/pt/5/59/Magali.png" },
+                { palavra: "CHICO", dica: "Personagem caipira que vive na roça. Adora goiabas. (Chico...)", imagem: "https://upload.wikimedia.org/wikipedia/pt/b/b8/Chico_Bento_%28personagem%29.jpg" },
+                { palavra: "BIDU", dica: "O cachorrinho azul e inteligente do Franjinha.", imagem: "https://upload.wikimedia.org/wikipedia/pt/e/e1/Bidu.png" },
+                { palavra: "FRANJINHA", dica: "O pequeno cientista da turma, sempre com um novo invento.", imagem: "https://upload.wikimedia.org/wikipedia/pt/3/36/Franjinha_%28Turma_da_M%C3%B4nica%29.png" },
+                { palavra: "ANJINHO", dica: "O anjo da guarda da turma, que vive nas nuvens.", imagem: "https://upload.wikimedia.org/wikipedia/pt/d/d6/Anjinho_personagem_2.png" },
+                { palavra: "ROSINHA", dica: "A namoradinha do Chico Bento.", imagem: "https://i.ibb.co/xtw5Xdnn/imagem-2025-07-07-153603372.png" },
+                { palavra: "JOTALHAO", dica: "Um elefante verde e desajeitado, amigo da turma da mata.", imagem: "https://upload.wikimedia.org/wikipedia/pt/8/8a/Jotalh%C3%A3o.png" },
+                { palavra: "HORACIO", dica: "Um dinossauro filósofo, vegetariano e de bom coração.", imagem: "https://upload.wikimedia.org/wikipedia/pt/9/95/Horacio.jpg" },
+                { palavra: "MINGAU", dica: "O gato de estimação da Magali.", imagem: "https://img.cartoongoodies.com/wp-content/uploads/2024/05/Turma-da-Monica-Mingau-300x258.png" },
+                { palavra: "PENADINHO", dica: "Um fantasminha camarada que vive no cemitério.", imagem: "https://static.wikia.nocookie.net/monica/images/9/9c/Penadinho.png/revision/latest?cb=20161115213419&path-prefix=pt-br" },
+                //{ palavra: "RAPOSAO", dica: "Amigo do Horácio, uma raposa que adora contar vantagem.", imagem: "https://i.ibb.co/S4HV3L1w/imagem-2025-07-07-153823466.png" },
+                { palavra: "LUCA", dica: "Um personagem cadeirante que adora esportes.", imagem: "https://i.ibb.co/Bdk91PP/imagem-2025-07-07-153924309.png" },
+                { palavra: "TITI", dica: "O garoto dentuço e galanteador da turma.", imagem: "https://upload.wikimedia.org/wikipedia/pt/f/f3/Titi_%28Turma_da_M%C3%B4nica%29.png" },
+                { palavra: "FLOR", dica: "Colorida e cheirosa, enfeita o jardim.", imagem: "https://i.pinimg.com/736x/75/9d/ab/759dabdcedc31e5a79298b5117f61e88.jpg" },
+                { palavra: "CORACAO", dica: "Órgão que bombeia sangue e símbolo do amor.", imagem: "ng-heart-icon-perfect-love-symbol-valentine-s-day-sign-emblem-isolated-on-flat-style-for-graphic-and-web-design-logo-dynamic-one-line-draw-png.png" },
+                { palavra: "SOL", dica: "A estrela que ilumina nosso dia.", imagem: "https://www.freeiconspng.com/uploads/medium-plain-sun-drawing-images-26.jpg" },
+                { palavra: "BOLA", dica: "Usada para jogar futebol.", imagem: "https://png.pngtree.com/png-vector/20191114/ourmid/pngtree-soccer-ball-icon-flat-style-png-image_1978253.jpg" },
+                { palavra: "CASA", dica: "O lugar onde moramos.", imagem: "https://gpng.net/wp-content/uploads/2020/10/house-png-free-cartoon-png-images.png" },
+                { palavra: "GATO", dica: "Animal de estimação que faz 'miau'.", imagem: "https://img.pikbest.com/png-images/20240902/cute-cat-cartoon-images-free-download_10784154.png!sw800" },
+                { palavra: "CACHORRO", dica: "Animal que faz 'au au'.", imagem: "https://easydrawingguides.com/wp-content/uploads/2021/12/cute-dog-step-by-step-drawing-tutorial-step-10.png" },
+                { palavra: "PASSARO", dica: "Animal que voa e canta.", imagem: "https://images.vexels.com/media/users/3/230516/isolated/preview/10174349f0f6d938d5ecaba3264b048c-plano-de-passaro-voando.png?w=360" },
+                { palavra: "BORBOLETA", dica: "Inseto colorido que voa.", imagem: "https://freesvg.org/img/Cute-Cartoon-Butterfly.png" },
+                { palavra: "PEIXE", dica: "Animal que vive na água.", imagem: "https://images.vexels.com/media/users/3/192646/isolated/preview/7621d350747c8357097aa34a5173cadd-fish-profile-hand-drawn.png?w=360" },
+                { palavra: "PATO", dica: "Animal que faz 'quack'.", imagem: "https://www.freeiconspng.com/uploads/duck-png-8.png" },
+            ];
 
-            const wordLists = {
-                6: listaDePalavras6Letras,
-                8: listaDePalavras8Letras,
-                10: listaDePalavras10Letras
-            };
+            const TAMANHO_GRID = 15;
+            const PALAVRAS_POR_JOGO = 7;
+            let matrizDoGrid;
+            let palavrasPosicionadas = [];
 
-            // --- ELEMENTOS DO DOM ---
-            const gameBoard = document.getElementById('game-board');
-            const keyboardContainer = document.getElementById('keyboard');
-            const hintButton = document.getElementById('hint-button');
-            const hintArea = document.getElementById('hint-area');
-            const restartButton = document.getElementById('restart-button');
-            const modeButtons = document.querySelectorAll('.mode-button[data-length]');
-            const modal = document.getElementById('alert-modal');
-            const alertMessage = document.getElementById('alert-message');
-            const revealedHintsList = document.getElementById('revealed-hints-list');
+            const elementoGrid = document.getElementById('crossword-grid');
+            const elementoSobreposicaoImagens = document.getElementById('image-overlay');
+            const elementoDicas = document.getElementById('clues-list');
+            const botaoNovoJogo = document.getElementById('new-game-btn');
+            const botaoDica = document.getElementById('hint-btn');
+            const elementoMensagem = document.getElementById('message');
 
-            // --- ESTADO DO JOGO ---
-            let wordLength = 6;
-            let totalGuesses = 6;
-            let currentRow = 0;
-            let currentTile = 0;
-            let secretWord = '';
-            let secretHint = '';
-            let isGameOver = false;
-            let hintClicks = 0;
-            let revealedHintIndexes = [];
+            function reiniciar() {
+                iniciarJogo();
+            }
+            function iniciarJogo() {
+                elementoMensagem.textContent = '';
+                palavrasPosicionadas = [];
+                let sucesso = false;
+                let tentativas = 0;
 
-            // --- FUNÇÕES DO JOGO ---
-
-            // Normaliza a palavra (remove acentos e para maiúsculas)
-            const normalizeWord = (word) => {
-                return word.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-            };
-
-            // Inicia ou reinicia o jogo
-            const initializeGame = (length) => {
-                wordLength = length;
-                currentRow = 0;
-                currentTile = 0;
-                isGameOver = false;
-                hintClicks = 0;
-                revealedHintIndexes = [];
-
-                // Seleciona a palavra e a dica
-                const wordList = wordLists[wordLength];
-                const wordData = wordList[Math.floor(Math.random() * wordList.length)];
-                secretWord = normalizeWord(wordData.palavra);
-                secretHint = wordData.dica;
-                
-                // Atualiza a interface
-                createBoard();
-                createKeyboard();
-                updateActiveModeButton();
-                hintArea.textContent = '';
-                revealedHintsList.innerHTML = ''; 
-                hintButton.disabled = false;
-            };
-
-            // Cria o tabuleiro
-            const createBoard = () => {
-                gameBoard.innerHTML = '';
-                gameBoard.style.gridTemplateRows = `repeat(${totalGuesses}, 1fr)`;
-                gameBoard.style.gridTemplateColumns = `repeat(${wordLength}, 1fr)`;
-                for (let i = 0; i < totalGuesses * wordLength; i++) {
-                    const tile = document.createElement('div');
-                    tile.classList.add('tile');
-                    tile.setAttribute('id', `tile-${Math.floor(i / wordLength)}-${i % wordLength}`);
-                    gameBoard.appendChild(tile);
+                while (!sucesso && tentativas < 20) {
+                    const palavrasSelecionadas = selecionarPalavrasAleatorias(bancoDePalavras, PALAVRAS_POR_JOGO);
+                    matrizDoGrid = criarGridVazio();
+                    palavrasPosicionadas = [];
+                    sucesso = gerarLayout(palavrasSelecionadas);
+                    tentativas++;
                 }
-            };
 
-            // Cria o teclado virtual
-            const createKeyboard = () => {
-                keyboardContainer.innerHTML = '';
-                const keys = [
-                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
-                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'ENTER',
-                    'BACKSPACE', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'
-                ];
-                keys.forEach(key => {
-                    const keyElement = document.createElement('button');
-                    keyElement.textContent = key;
-                    keyElement.classList.add('key');
-                    keyElement.setAttribute('data-key', key);
-                    if (key === 'BACKSPACE') {
-                        keyElement.classList.add('large');
-                    }
-                    if (key === 'ENTER') {
-                        keyElement.classList.add('alt');
-                    }
-                    keyboardContainer.appendChild(keyElement);
-                });
-            };
-
-            // Atualiza o botão de modo ativo
-            const updateActiveModeButton = () => {
-                modeButtons.forEach(btn => {
-                    if (parseInt(btn.dataset.length) === wordLength) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-            };
-            
-            // Lida com a entrada do teclado (físico e virtual)
-            const handleKeyPress = (key) => {
-                if (isGameOver) return;
-
-                if (key === 'BACKSPACE') {
-                    deleteLetter();
-                } else if (key === 'ENTER') {
-                    submitGuess();
-                } else if (currentTile < wordLength && /^[A-Z]$/.test(key)) {
-                    addLetter(key);
-                }
-            };
-            
-            // Adiciona uma letra ao tabuleiro
-            const addLetter = (letter) => {
-                const tile = document.getElementById(`tile-${currentRow}-${currentTile}`);
-                tile.textContent = letter;
-                tile.classList.add('filled');
-                currentTile++;
-            };
-
-            // Remove a última letra
-            const deleteLetter = () => {
-                if (currentTile > 0) {
-                    currentTile--;
-                    const tile = document.getElementById(`tile-${currentRow}-${currentTile}`);
-                    tile.textContent = '';
-                    tile.classList.remove('filled');
-                }
-            };
-
-            // Envia a tentativa
-            const submitGuess = () => {
-                if (currentTile < wordLength) {
-                    showAlert(`A palavra tem ${wordLength} letras!`);
+                if (!sucesso) {
+                    //elementoMensagem.textContent = "Erro ao gerar o jogo. Tente novamente.";
+                    reiniciar();
                     return;
+                    //return;
                 }
-
-                const guess = getCurrentGuess();
-                flipRow(guess);
                 
-                if (guess === secretWord) {
-                    showAlert('Você venceu!', 2000);
-                    isGameOver = true;
-                    hintButton.disabled = true;
-                } else {
-                    currentRow++;
-                    currentTile = 0;
-                    if (currentRow >= totalGuesses) {
-                        isGameOver = true;
-                        hintButton.disabled = true;
-                        showAlert(`Fim de jogo! A palavra era: ${secretWord}`, 5000);
-                    }
-                }
-            };
+                palavrasPosicionadas.sort((a, b) => (a.linha * TAMANHO_GRID + a.coluna) - (b.linha * TAMANHO_GRID + b.coluna));
+                renderizarGrid();
+                renderizarImagens();
+                renderizarDicas();
+            }
 
-            // Pega a tentativa atual do tabuleiro
-            const getCurrentGuess = () => {
-                let guess = '';
-                for (let i = 0; i < wordLength; i++) {
-                    guess += document.getElementById(`tile-${currentRow}-${i}`).textContent;
-                }
-                return guess;
-            };
+            function selecionarPalavrasAleatorias(banco, quantidade) {
+                const embaralhado = [...banco].sort(() => 0.5 - Math.random());
+                return embaralhado.slice(0, quantidade);
+            }
 
-            // Anima a linha e verifica as letras
-            const flipRow = (guess) => {
-                const guessLetters = guess.split('');
-                const secretLetters = secretWord.split('');
-                const checkedLetters = new Array(wordLength).fill(null);
+            function criarGridVazio() {
+                return Array.from({ length: TAMANHO_GRID }, () => Array(TAMANHO_GRID).fill(null));
+            }
 
-                // 1ª Passada: Verificar letras corretas (posição exata)
-                guessLetters.forEach((letter, index) => {
-                    if (letter === secretLetters[index]) {
-                        checkedLetters[index] = 'correct';
-                        secretLetters[index] = null; // Marcar como já usada
-                    }
-                });
-
-                // 2ª Passada: Verificar letras presentes (posição errada)
-                guessLetters.forEach((letter, index) => {
-                    if (checkedLetters[index] === null && secretLetters.includes(letter)) {
-                        checkedLetters[index] = 'present';
-                        secretLetters[secretLetters.indexOf(letter)] = null; // Marcar como já usada
-                    }
-                });
-
-                // Animar e colorir os blocos e o teclado
-                guessLetters.forEach((letter, index) => {
-                    const tile = document.getElementById(`tile-${currentRow}-${index}`);
-                    const key = keyboardContainer.querySelector(`[data-key="${letter}"]`);
-                    const status = checkedLetters[index] || 'absent';
-                    
-                    setTimeout(() => {
-                        tile.classList.add('flip');
-                        tile.classList.add(status);
-                        
-                        // Atualiza a cor do teclado
-                        const currentKeyStatus = key.dataset.status;
-                        if (currentKeyStatus !== 'correct') {
-                             key.style.backgroundColor = status === 'correct' ? 'var(--cor-correta)' : (status === 'present' ? 'var(--cor-presente)' : 'var(--cor-ausente)');
-                             key.style.color = 'white';
-                             key.dataset.status = status;
-                        }
-
-                    }, index * 400);
-                });
-            };
-
-            // Lida com o clique no botão de dica
-            const handleHintClick = () => {
-                hintClicks++;
-                if (hintClicks === 1) {
-                    hintArea.textContent = `Dica: ${secretHint}`;
-                } else if (hintClicks >= 2 && hintClicks <= 4) {
-                    const correctIndices = new Set();
-                    for(let i = 0; i < currentRow; i++) {
-                        for(let j = 0; j < wordLength; j++) {
-                            const tile = document.getElementById(`tile-${i}-${j}`);
-                            if(tile.classList.contains('correct')) {
-                                correctIndices.add(j);
+            function gerarLayout(palavras) {
+                palavras.sort((a, b) => b.palavra.length - a.palavra.length);
+                for (const objetoPalavra of palavras) {
+                    let posicionada = false;
+                    if (palavrasPosicionadas.length === 0) {
+                        const linha = Math.floor(TAMANHO_GRID / 2);
+                        const coluna = Math.floor((TAMANHO_GRID - objetoPalavra.palavra.length) / 2);
+                        posicionarPalavra(objetoPalavra, linha, coluna, 'horizontal');
+                        posicionada = true;
+                    } else {
+                        for (let i = 0; i < 100 && !posicionada; i++) {
+                            const intersecao = encontrarIntersecao(objetoPalavra.palavra);
+                            if (intersecao) {
+                                const { palavraExistente, indiceCharParaPosicionar, indiceCharExistente } = intersecao;
+                                const direcao = palavraExistente.direcao === 'horizontal' ? 'vertical' : 'horizontal';
+                                let linha, coluna;
+                                if (direcao === 'vertical') {
+                                    linha = palavraExistente.linha - indiceCharParaPosicionar;
+                                    coluna = palavraExistente.coluna + indiceCharExistente;
+                                } else {
+                                    linha = palavraExistente.linha + indiceCharExistente;
+                                    coluna = palavraExistente.coluna - indiceCharParaPosicionar;
+                                }
+                                if (podePosicionarPalavra(objetoPalavra.palavra, linha, coluna, direcao)) {
+                                    posicionarPalavra(objetoPalavra, linha, coluna, direcao);
+                                    posicionada = true;
+                                }
                             }
                         }
                     }
+                    if (!posicionada) return false;
+                }
+                return true;
+            }
 
-                    const availableIndices = [];
-                    for (let i = 0; i < wordLength; i++) {
-                        if (!correctIndices.has(i) && !revealedHintIndexes.includes(i)) {
-                            availableIndices.push(i);
+            function encontrarIntersecao(palavraParaPosicionar) {
+                const palavrasEmbaralhadas = [...palavrasPosicionadas].sort(() => 0.5 - Math.random());
+                for (const palavraExistente of palavrasEmbaralhadas) {
+                    for (let i = 0; i < palavraExistente.palavra.length; i++) {
+                        for (let j = 0; j < palavraParaPosicionar.length; j++) {
+                            if (palavraExistente.palavra[i] === palavraParaPosicionar[j]) {
+                                return { palavraExistente, indiceCharParaPosicionar: j, indiceCharExistente: i };
+                            }
                         }
                     }
+                }
+                return null;
+            }
 
-                    if (availableIndices.length > 0) {
-                        const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                        revealedHintIndexes.push(randomIndex);
-                        const letter = secretWord[randomIndex];
-                        
-                        // Adiciona a dica no painel lateral
-                        const hintElement = document.createElement('div');
-                        hintElement.classList.add('revealed-hint');
-                        hintElement.textContent = `${randomIndex + 1}ª Letra: ${letter}`;
-                        revealedHintsList.appendChild(hintElement);
+            function podePosicionarPalavra(palavra, linha, coluna, direcao) {
+                if (direcao === 'horizontal') {
+                    if (coluna < 0 || coluna + palavra.length > TAMANHO_GRID) return false;
+                    if (coluna > 0 && matrizDoGrid[linha][coluna - 1]) return false;
+                    if (coluna + palavra.length < TAMANHO_GRID && matrizDoGrid[linha][coluna + palavra.length]) return false;
 
-                    } else {
-                        showAlert('Nenhuma nova letra para revelar!');
+                    for (let i = 0; i < palavra.length; i++) {
+                        if (matrizDoGrid[linha][coluna + i] && matrizDoGrid[linha][coluna + i] !== palavra[i]) return false;
+                        if (matrizDoGrid[linha][coluna + i] === null) {
+                            if (linha > 0 && matrizDoGrid[linha - 1][coluna + i]) return false;
+                            if (linha < TAMANHO_GRID - 1 && matrizDoGrid[linha + 1][coluna + i]) return false;
+                        }
                     }
-                } else {
-                    showAlert('Você já usou todas as dicas de letras!');
+                } else { // vertical
+                    if (linha < 0 || linha + palavra.length > TAMANHO_GRID) return false;
+                    if (linha > 0 && matrizDoGrid[linha - 1][coluna]) return false;
+                    if (linha + palavra.length < TAMANHO_GRID && matrizDoGrid[linha + palavra.length][coluna]) return false;
+
+                    for (let i = 0; i < palavra.length; i++) {
+                        if (matrizDoGrid[linha + i][coluna] && matrizDoGrid[linha + i][coluna] !== palavra[i]) return false;
+                        if (matrizDoGrid[linha + i][coluna] === null) {
+                            if (coluna > 0 && matrizDoGrid[linha + i][coluna - 1]) return false;
+                            if (coluna < TAMANHO_GRID - 1 && matrizDoGrid[linha + i][coluna + 1]) return false;
+                        }
+                    }
                 }
-            };
+                return true;
+            }
 
-            // Mostra um alerta customizado
-            const showAlert = (message, duration = 1500) => {
-                alertMessage.textContent = message;
-                modal.style.display = 'flex';
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, duration);
-            };
+            function posicionarPalavra(objetoPalavra, linha, coluna, direcao) {
+                for (let i = 0; i < objetoPalavra.palavra.length; i++) {
+                    if (direcao === 'horizontal') matrizDoGrid[linha][coluna + i] = objetoPalavra.palavra[i];
+                    else matrizDoGrid[linha + i][coluna] = objetoPalavra.palavra[i];
+                }
+                palavrasPosicionadas.push({ ...objetoPalavra, linha, coluna, direcao, estaResolvida: false });
+            }
 
-            // --- EVENT LISTENERS ---
+            function renderizarGrid() {
+                elementoGrid.innerHTML = '';
+                const cellSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size'));
+                const gapSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gap-size'));
+                elementoGrid.style.gridTemplateColumns = `repeat(${TAMANHO_GRID}, 1fr)`;
+
+                for (let r = 0; r < TAMANHO_GRID; r++) {
+                    for (let c = 0; c < TAMANHO_GRID; c++) {
+                        const celula = document.createElement('div');
+                        celula.classList.add('cell');
+                        if (matrizDoGrid[r][c]) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.maxLength = 1;
+                            input.dataset.linha = r;
+                            input.dataset.coluna = c;
+                            input.addEventListener('input', gerenciarInput);
+                            celula.appendChild(input);
+                            
+                            const inicioPalavra = palavrasPosicionadas.find(p => p.linha === r && p.coluna === c);
+                            if (inicioPalavra) {
+                                const numeroDica = document.createElement('span');
+                                numeroDica.classList.add('clue-number');
+                                numeroDica.textContent = palavrasPosicionadas.indexOf(inicioPalavra) + 1;
+                                celula.appendChild(numeroDica);
+                            }
+                        } else {
+                            celula.classList.add('blocked');
+                        }
+                        elementoGrid.appendChild(celula);
+                    }
+                }
+            }
             
-            keyboardContainer.addEventListener('click', (e) => {
-                if (e.target.matches('.key')) {
-                    handleKeyPress(e.target.dataset.key);
-                }
-            });
+            function renderizarImagens() {
+                elementoSobreposicaoImagens.innerHTML = '';
+                const cellSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size'));
+                const gapSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gap-size'));
+                const totalCellSize = cellSize + gapSize;
 
-            window.addEventListener('keydown', (e) => {
-                let key = e.key.toUpperCase();
-                if (key === 'BACKSPACE') {
-                    handleKeyPress('BACKSPACE');
-                } else if (key === 'ENTER') {
-                    handleKeyPress('ENTER');
-                } else if (key.length === 1 && key >= 'A' && key <= 'Z') {
-                    handleKeyPress(key);
-                }
-            });
+                palavrasPosicionadas.forEach(palavra => {
+                    const imagem = document.createElement('img');
+                    imagem.src = palavra.imagem;
+                    imagem.alt = `Imagem de ${palavra.palavra}`;
 
-            modeButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const length = parseInt(button.dataset.length);
-                    initializeGame(length);
+                    let topPos = palavra.linha * totalCellSize;
+                    let leftPos = palavra.coluna * totalCellSize;
+
+                    if (palavra.direcao === 'horizontal') {
+                        leftPos -= totalCellSize;
+                    } else { // vertical
+                        topPos -= totalCellSize;
+                    }
+                    
+                    imagem.style.top = `${topPos}px`;
+                    imagem.style.left = `${leftPos}px`;
+
+                    elementoSobreposicaoImagens.appendChild(imagem);
                 });
-            });
+            }
 
-            restartButton.addEventListener('click', () => {
-                initializeGame(wordLength);
-            });
-            
-            hintButton.addEventListener('click', handleHintClick);
+            /*function renderizarDicas() {
+                elementoDicas.innerHTML = '';
+                palavrasPosicionadas.forEach((palavra, indice) => {
+                    const itemLista = document.createElement('li');
+                    itemLista.innerHTML = `<b>${indice + 1}.</b> ${palavra.dica}`;
+                    elementoDicas.appendChild(itemLista);
+                });
+            }*/
 
-            window.onclick = (event) => {
-                if (event.target == modal) {
-                    modal.style.display = "none";
+            function gerenciarInput(e) {
+                const input = e.target;
+                input.value = input.value.toUpperCase();
+                const r = parseInt(input.dataset.linha);
+                const c = parseInt(input.dataset.coluna);
+
+                const palavrasNaCelula = palavrasPosicionadas.filter(p => {
+                    if (p.direcao === 'horizontal') {
+                        return p.linha === r && c >= p.coluna && c < p.coluna + p.palavra.length;
+                    } else {
+                        return p.coluna === c && r >= p.linha && r < p.linha + p.palavra.length;
+                    }
+                });
+
+                palavrasNaCelula.forEach(palavra => verificarPalavraAutomaticamente(palavra));
+            }
+
+            function verificarPalavraAutomaticamente(palavra) {
+                if (palavra.estaResolvida) return;
+
+                let palpiteAtual = '';
+                let tudoPreenchido = true;
+                const inputs = [];
+
+                for (let i = 0; i < palavra.palavra.length; i++) {
+                    let r = palavra.linha, c = palavra.coluna;
+                    if (palavra.direcao === 'horizontal') c += i;
+                    else r += i;
+                    
+                    const input = elementoGrid.querySelector(`input[data-linha='${r}'][data-coluna='${c}']`);
+                    if (input) {
+                        inputs.push(input);
+                        if (input.value) {
+                            palpiteAtual += input.value;
+                        } else {
+                            tudoPreenchido = false;
+                        }
+                    }
+                }
+                
+                if (tudoPreenchido && palpiteAtual === palavra.palavra) {
+                    palavra.estaResolvida = true;
+                    inputs.forEach(input => {
+                        input.classList.add('correct');
+                        input.readOnly = true;
+                    });
+                    verificarCondicaoVitoria();
                 }
             }
 
-            // --- INÍCIO DO JOGO ---
-            initializeGame(6);
+            function darDica() {
+                const inputsNaoResolvidos = [];
+                elementoGrid.querySelectorAll('input').forEach(input => {
+                    if (!input.readOnly && !input.value) {
+                        inputsNaoResolvidos.push(input);
+                    }
+                });
+
+                if (inputsNaoResolvidos.length > 0) {
+                    const inputAleatorio = inputsNaoResolvidos[Math.floor(Math.random() * inputsNaoResolvidos.length)];
+                    const r = parseInt(inputAleatorio.dataset.linha);
+                    const c = parseInt(inputAleatorio.dataset.coluna);
+                    inputAleatorio.value = matrizDoGrid[r][c];
+                    inputAleatorio.classList.add('hint');
+                    gerenciarInput({ target: inputAleatorio });
+                }
+            }
+            
+            function verificarCondicaoVitoria() {
+                const tudoResolvido = palavrasPosicionadas.every(p => p.estaResolvida);
+                if (tudoResolvido) {
+                    elementoMensagem.textContent = "Parabéns! Você completou o jogo!";
+                }
+            }
+
+            botaoNovoJogo.addEventListener('click', iniciarJogo);
+            botaoDica.addEventListener('click', darDica);
+            
+            // Recalcular imagens ao redimensionar a janela
+            window.addEventListener('resize', renderizarImagens);
+
+            iniciarJogo();
         });
     </script>
 
