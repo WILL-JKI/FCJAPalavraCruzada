@@ -1,0 +1,240 @@
+:root {
+    --main-color: #0077b6;
+    --dark-color: #14213d;
+    --light-color: #ffffff;
+    --correct-color: #4caf50;
+    --hint-color: #a5d6a7;
+    --font-title: 'Lilita One', cursive;
+    --font-body: 'Roboto', sans-serif;
+    --cell-size: 40px;
+    --gap-size: 2px;
+    --bg-img: url('https://img.freepik.com/vetores-gratis/fundo-de-vida-selvagem-desenhado-a-mao_23-2149416665.jpg?t=st=1752041650~exp=1752045250~hmac=ed0b5671364ef3e8593e060730b8ed6edad29d71204622b98d0fc5efab6b64b0&w=2000');
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    background-image: url('../fundocacapalavra.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+#game-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 20px 0;
+}
+
+#crossword-container {
+    position: relative; 
+    flex-shrink: 0;
+}
+
+#image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; 
+    z-index: 2;
+}
+
+#image-overlay img {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    object-fit: cover;
+    z-index: 5;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#image-overlay img:hover,
+#image-overlay img.enlarged {
+    width: calc(var(--cell-size) * 2);
+    height: calc(var(--cell-size) * 2);
+    border-radius: 8px;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 20;
+    transform: translate(-25%, -25%);
+}
+
+#crossword-grid {
+    display: grid;
+    gap: var(--gap-size);
+}
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--light-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell.blocked {
+    background-color: transparent;
+    border: none;
+}
+
+.cell input {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    text-align: center;
+    font-size: 1.5rem;
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    background-color: var(--light-color);
+    transition: all 0.2s ease;
+    border-radius: 2px;
+}
+
+.cell input:focus {
+    border-color: var(--main-color);
+    background-color: #e3f2fd;
+}
+
+.cell input.correct {
+    background-color: var(--correct-color);
+    color: white;
+    font-weight: bold;
+}
+
+.cell input.hint {
+    background-color: var(--hint-color);
+    color: var(--dark-color);
+}
+
+.clue-number {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: var(--main-color);
+    pointer-events: none;
+    z-index: 1;
+}
+
+
+
+#actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+button {
+    padding: 12px 25px;
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    border: 2px solid var(--dark-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: var(--light-color);
+    color: var(--dark-color);
+}
+
+button:hover {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    transform: translateY(-2px);
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    height: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+    color: var(--correct-color);
+}
+
+/* Popup de Vitória */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.popup-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.popup-content {
+    background-color: var(--light-color);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 90%;
+    width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.popup-overlay.active .popup-content {
+    transform: translateY(0);
+}
+
+.popup-content h2 {
+    color: var(--main-color);
+    font-family: var(--font-title);
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.popup-content p {
+    font-size: 1.2rem;
+    margin: 1rem 0 2rem;
+}
+
+#close-popup {
+    background-color: var(--main-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#close-popup:hover {
+    background-color: var(--dark-color);
+    transform: translateY(-2px);
+}
