@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavras Cruzadas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/grid-fix.css">
+</head>
+<body>
+    <header class="site-header">
+        <h1>PALAVRA CRUZADA FCJA</h1>
+    </header>
+    
+    <div id="game-wrapper">
+        <div id="game-container">
+            <div id="crossword-container">
+                <div id="grid-background"></div>
+                <div id="crossword-grid"></div>
+            </div>
+            <div id="image-sidebar">
+                <h3>Imagens</h3>
+                <div id="image-list"></div>
+            </div>
+        </div>
+        <div id="image-overlay"></div>
+    </div>
+
+    <div id="actions">
+        <button id="new-game-btn">Novo Jogo</button>
+        <button id="hint-btn">Dica</button>
+    </div>
+
+    <div id="message"></div>
+
+    <!-- Popup de Vitória -->
+    <div id="victory-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Parabéns! 🎉</h2>
+            <p>Você completou o jogo com sucesso!</p>
+            <button id="close-popup">Jogar Novamente</button>
+        </div>
+    </div>
+
+    </div>
+    
+    <footer class="site-footer">
+        <p id="about-link" style="cursor: pointer;">Sobre nós: Desenvolvido por diversão e aprendizado</p>
+    </footer>
+
+    <!-- Popup Sobre -->
+    <div id="about-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Sobre o Jogo</h2>
+            <div style="text-align: left; margin: 20px 0;">
+                <h3>Desenvolvedor</h3>
+                <p>Este jogo foi desenvolvido por <a href="https://github.com/WILL-JKI" target="_blank" style="color: var(--main-color); text-decoration: none;">WILL-JKI</a>, um entusiasta de desenvolvimento de jogos e programação.</p>
+                
+                <h3>Fundação Casa de José Américo</h3>
+                <p>Este projeto foi criado em parceria com a <a href="https://fcja.pb.gov.br" target="_blank" style="color: var(--main-color); text-decoration: none;">Fundação Casa de José Américo</a>, uma instituição dedicada à preservação da cultura e memória paraibana.</p>
+                
+                <p style="margin-top: 20px; font-style: italic;">Jogo desenvolvido com fins educacionais e de entretenimento.</p>
+            </div>
+            <button id="close-about-popup">Fechar</button>
+        </div>
+    </div>
+    
+    <script src="js/game.js"></script>
+    <script>
+        // Adiciona funcionalidade ao link "Sobre nós"
+        document.getElementById('about-link').addEventListener('click', function() {
+            document.getElementById('about-popup').classList.add('active');
+        });
+
+        // Fecha o popup ao clicar no botão de fechar
+        document.getElementById('close-about-popup').addEventListener('click', function() {
+            document.getElementById('about-popup').classList.remove('active');
+        });
+
+        // Fecha o popup ao clicar fora do conteúdo
+        document.querySelectorAll('.popup-overlay').forEach(popup => {
+            popup.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
